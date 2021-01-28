@@ -127,6 +127,9 @@
   #if defined(COREXY)
     #error "CORE XY not supported with dual axis feature."
   #endif
+  #if defined(SCARA)
+    #error "SCARA not supported with dual axis feature."
+  #endif
   #if defined(USE_SPINDLE_DIR_AS_ENABLE_PIN)
     #error "USE_SPINDLE_DIR_AS_ENABLE_PIN not supported with dual axis feature."
   #endif

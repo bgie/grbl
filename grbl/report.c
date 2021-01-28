@@ -384,6 +384,9 @@ void report_build_info(char *line)
   #endif
   #ifdef COREXY
     serial_write('C');
+  #endif 
+  #ifdef SCARA
+    serial_write('s');
   #endif
   #ifdef PARKING_ENABLE
     serial_write('P');

@@ -192,6 +192,8 @@ void limits_go_home(uint8_t cycle_mask)
     step_pin[idx] = get_step_pin_mask(idx);
     #ifdef COREXY
       if ((idx==A_MOTOR)||(idx==B_MOTOR)) { step_pin[idx] = (get_step_pin_mask(X_AXIS)|get_step_pin_mask(Y_AXIS)); }
+    #elif defined(SCARA)
+      if (idx==A_MOTOR) { step_pin[idx] = (get_step_pin_mask(X_AXIS)|get_step_pin_mask(Y_AXIS)); }
     #endif
 
     if (bit_istrue(cycle_mask,bit(idx))) {
@@ -236,6 +238,17 @@ void limits_go_home(uint8_t cycle_mask)
           } else {
             sys_position[Z_AXIS] = 0;
           }
+	    #elif defined(SCARA)
+          if (idx == X_AXIS) {
+            int32_t axis_position = system_convert_scara_to_y_axis_steps(sys_position);
+            sys_position[A_MOTOR] = 0;
+            sys_position[B_MOTOR] = axis_position;
+		  } else if (idx == Y_AXIS) {
+            int32_t axis_position = system_convert_scara_to_x_axis_steps(sys_position);
+            sys_position[B_MOTOR] = axis_position;
+          } else {
+            sys_position[Z_AXIS] = 0;
+          }
         #else
           sys_position[idx] = 0;
         #endif
@@ -275,6 +288,9 @@ void limits_go_home(uint8_t cycle_mask)
             if (limit_state & (1 << idx)) {
               #ifdef COREXY
                 if (idx==Z_AXIS) { axislock &= ~(step_pin[Z_AXIS]); }
+                else { axislock &= ~(step_pin[A_MOTOR]|step_pin[B_MOTOR]); }
+              #elif defined(SCARA)
+                if (idx==Z_AXIS || idx==B_MOTOR) { axislock &= ~(step_pin[idx]); }
                 else { axislock &= ~(step_pin[A_MOTOR]|step_pin[B_MOTOR]); }
               #else
                 axislock &= ~(step_pin[idx]);
@@ -392,6 +408,17 @@ void limits_go_home(uint8_t cycle_mask)
           int32_t off_axis_position = system_convert_corexy_to_x_axis_steps(sys_position);
           sys_position[A_MOTOR] = off_axis_position + set_axis_position;
           sys_position[B_MOTOR] = off_axis_position - set_axis_position;
+        } else {
+          sys_position[idx] = set_axis_position;
+        }
+	  #elif defined(SCARA)
+        if (idx==X_AXIS) {
+          int32_t off_axis_position = system_convert_scara_to_y_axis_steps(sys_position);
+          sys_position[A_MOTOR] = set_axis_position;
+          sys_position[B_MOTOR] = off_axis_position;
+        } else if (idx==Y_AXIS) {
+          int32_t off_axis_position = system_convert_scara_to_x_axis_steps(sys_position);
+          sys_position[B_MOTOR] = off_axis_position + set_axis_position;
         } else {
           sys_position[idx] = set_axis_position;
         }

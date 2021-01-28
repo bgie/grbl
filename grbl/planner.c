@@ -336,6 +336,10 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
       position_steps[X_AXIS] = system_convert_corexy_to_x_axis_steps(sys_position);
       position_steps[Y_AXIS] = system_convert_corexy_to_y_axis_steps(sys_position);
       position_steps[Z_AXIS] = sys_position[Z_AXIS];
+    #elif defined(SCARA)
+      position_steps[X_AXIS] = system_convert_scara_to_x_axis_steps(sys_position);
+      position_steps[Y_AXIS] = system_convert_scara_to_y_axis_steps(sys_position);
+      position_steps[Z_AXIS] = sys_position[Z_AXIS];
     #else
       memcpy(position_steps, sys_position, sizeof(sys_position)); 
     #endif
@@ -346,6 +350,11 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
     target_steps[B_MOTOR] = lround(target[B_MOTOR]*settings.steps_per_mm[B_MOTOR]);
     block->steps[A_MOTOR] = labs((target_steps[X_AXIS]-position_steps[X_AXIS]) + (target_steps[Y_AXIS]-position_steps[Y_AXIS]));
     block->steps[B_MOTOR] = labs((target_steps[X_AXIS]-position_steps[X_AXIS]) - (target_steps[Y_AXIS]-position_steps[Y_AXIS]));
+  #elif defined(SCARA)
+    target_steps[A_MOTOR] = lround(target[A_MOTOR]*settings.steps_per_mm[A_MOTOR]);
+    target_steps[B_MOTOR] = lround(target[B_MOTOR]*settings.steps_per_mm[B_MOTOR]);
+	block->steps[A_MOTOR] = labs((target_steps[X_AXIS]-position_steps[X_AXIS]));
+	block->steps[B_MOTOR] = labs((target_steps[X_AXIS]-position_steps[X_AXIS]) + (target_steps[Y_AXIS]-position_steps[Y_AXIS]));
   #endif
 
   for (idx=0; idx<N_AXIS; idx++) {
@@ -365,12 +374,23 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
       } else {
         delta_mm = (target_steps[idx] - position_steps[idx])/settings.steps_per_mm[idx];
       }
+    #elif defined(SCARA)
+      if ( !(idx == A_MOTOR) && !(idx == B_MOTOR) ) {
+        target_steps[idx] = lround(target[idx]*settings.steps_per_mm[idx]);
+        block->steps[idx] = labs(target_steps[idx]-position_steps[idx]);
+      }
+      block->step_event_count = max(block->step_event_count, block->steps[idx]);
+      if (idx == B_MOTOR) {
+        delta_mm = ((target_steps[X_AXIS]-position_steps[X_AXIS]) + (target_steps[Y_AXIS]-position_steps[Y_AXIS]))/settings.steps_per_mm[idx];
+      } else {
+        delta_mm = (target_steps[idx] - position_steps[idx])/settings.steps_per_mm[idx];
+      }	  
     #else
       target_steps[idx] = lround(target[idx]*settings.steps_per_mm[idx]);
       block->steps[idx] = labs(target_steps[idx]-position_steps[idx]);
       block->step_event_count = max(block->step_event_count, block->steps[idx]);
       delta_mm = (target_steps[idx] - position_steps[idx])/settings.steps_per_mm[idx];
-	  #endif
+	#endif
     unit_vec[idx] = delta_mm; // Store unit vector numerator
 
     // Set direction bits. Bit enabled always means direction is negative.
@@ -487,6 +507,12 @@ void plan_sync_position()
       } else {
         pl.position[idx] = sys_position[idx];
       }
+	#elif defined(SCARA)
+      if (idx==Y_AXIS) {
+        pl.position[Y_AXIS] = system_convert_scara_to_y_axis_steps(sys_position);
+      } else {
+        pl.position[idx] = sys_position[idx];
+      }	  
     #else
       pl.position[idx] = sys_position[idx];
     #endif
