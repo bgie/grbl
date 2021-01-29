@@ -34,8 +34,11 @@
 // NOTE: OEMs can avoid the need to maintain/update the defaults.h and cpu_map.h files and use only
 // one configuration file by placing their specific defaults and pin map at the bottom of this file.
 // If doing so, simply comment out these two defines and see instructions below.
-#define DEFAULTS_GENERIC
+#define DEFAULTS_SCARA
 #define CPU_MAP_ATMEGA328P // Arduino Uno CPU
+
+// Use scara motor configuration: the Y axis rotation is controlled by both steppers
+#define SCARA
 
 // Serial baud rate
 // #define BAUD_RATE 230400
@@ -187,8 +190,6 @@
 // described, if not, motions may move in strange directions. Grbl requires the CoreXY A and B motors
 // have the same steps per mm internally.
 // #define COREXY // Default disabled. Uncomment to enable.
-
-#define SCARA
 
 // Inverts pin logic of the control command pins based on a mask. This essentially means you can use
 // normally-closed switches on the specified pins, rather than the default normally-open switches.
