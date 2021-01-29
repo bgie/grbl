@@ -58,6 +58,7 @@
 #include "report.h"
 #include "serial.h"
 #include "spindle_control.h"
+#include "servo_control.h"
 #include "stepper.h"
 #include "jog.h"
 
@@ -136,6 +137,10 @@
   #if defined(ENABLE_M7)
     #error "ENABLE_M7 not supported with dual axis feature."
   #endif
+#endif
+
+#if defined(VARIABLE_SPINDLE) && defined(PEN_SERVO)
+  #error PEN_SERVO and VARIABLE_SPINDLE can not be combined, both use the same PWM pin
 #endif
 
 // ---------------------------------------------------------------------------------------

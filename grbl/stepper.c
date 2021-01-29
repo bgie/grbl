@@ -401,6 +401,9 @@ ISR(TIMER1_COMPA_vect)
     }
   }
 
+  #ifdef PEN_SERVO
+    update_pen_from_z();
+  #endif
 
   // Check probing state.
   if (sys_probe_state == PROBE_ACTIVE) { probe_state_monitor(); }

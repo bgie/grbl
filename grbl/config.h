@@ -2,6 +2,8 @@
   config.h - compile time configuration
   Part of Grbl
 
+  Copyright (c) 2021 Brecht Kuppens - https://github.com/bgie/grbl
+  Copyright (c) 2017-2019 Bart Dring - https://github.com/bdring/Grbl_Pen_Servo
   Copyright (c) 2012-2016 Sungeun K. Jeon for Gnea Research LLC
   Copyright (c) 2009-2011 Simen Svale Skogsrud
 
@@ -39,6 +41,32 @@
 
 // Use scara motor configuration: the Y axis rotation is controlled by both steppers
 #define SCARA
+
+// Use a servo that follows the z-axis
+#define PEN_SERVO
+
+/*
+For the pen we want to use the variable spindle PWM to control a servo.
+The spindle output is using a PWM, but we need to adjust that 
+Use 1024 prescaler to get 16,000,000 Mhz  / 1024 = 15625 Hz
+It is an 8 bit timer so 15625 / 256 = 61 Hz. This is pretty close the the 50Hz recommended for servos
+Each tick = 0.000064sec 
+One end of servo is 0.001 sec (0.001 / 0.000064 = 15.6 ticks)
+The other end is 0.002 sec (0.002 / 0.000064 = 31 ticks)
+
+These are full travel values. If you want to move less than full travel adjust these values
+If your servo is going the wrong way, swap them.
+*/
+#define PEN_SERVO_DOWN     31
+#define PEN_SERVO_UP       16 
+
+/*
+The Z-values corresponding to the pen up and pen down position. Z values in between will be interpolated.
+But interpolation only has 15 ticks on the full range, so servo movement will be very coarse.
+*/
+#define Z_VALUE_PEN_UP		0.0
+#define Z_VALUE_PEN_DOWN	-1.0
+
 
 // Serial baud rate
 // #define BAUD_RATE 230400
@@ -339,7 +367,7 @@
 // enable pin will output 5V for maximum RPM with 256 intermediate levels and 0V when disabled.
 // NOTE: IMPORTANT for Arduino Unos! When enabled, the Z-limit pin D11 and spindle enable pin D12 switch!
 // The hardware PWM output on pin D11 is required for variable spindle output voltages.
-#define VARIABLE_SPINDLE // Default enabled. Comment to disable.
+// #define VARIABLE_SPINDLE // Default enabled. Comment to disable.
 
 // Used by variable spindle output only. This forces the PWM output to a minimum duty cycle when enabled.
 // The PWM pin will still read 0V when the spindle is disabled. Most users will not need this option, but
