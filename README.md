@@ -1,3 +1,13 @@
+Modified version of grbl for 3d printed SCARA robot arm.
+
+Work in progress...
+
+Changes:
+- modified configuration to match SCARA robot arm.
+- stepper motor calculation adapted to match pulley system of 2nd robot axis.
+- linked a hobby servo motor to the Z axis, to move a plotter pen. Loosely based on work from Bart Dring - https://github.com/bdring/Grbl_Pen_Servo
+
+
 ![GitHub Logo](https://github.com/gnea/gnea-Media/blob/master/Grbl%20Logo/Grbl%20Logo%20250px.png?raw=true)
 
 ***
