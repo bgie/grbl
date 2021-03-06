@@ -570,9 +570,17 @@
 
 
 #ifdef DEFAULTS_SCARA
-  // settings for SCARA robot arm
-  #define DEFAULT_X_STEPS_PER_MM 2000.0
-  #define DEFAULT_Y_STEPS_PER_MM 2000.0
+  // settings for SCARA robot arm 
+  // arm length is hardcoded because this way the C compiler can precompute parts of the inverse kinematics calculations
+  #define ARM1_LENGTH 150.0
+  #define ARM2_LENGTH 180.0
+  #define HOME_CARTHESIAN_X	 65.0
+  #define HOME_CARTHESIAN_Y	 170.0
+  
+  // 200 steps per rotation, 16 microsteps per step, 20 teeth on motor, 80 teeth on arm = 12800 microsteps for a full arm rotation
+  // Rotation = 2*PI radians -> 2037.1832715762602978417121711682 steps per radian
+  #define DEFAULT_X_STEPS_PER_MM 2037.1832715762602978417121711682
+  #define DEFAULT_Y_STEPS_PER_MM 2037.1832715762602978417121711682
   #define DEFAULT_Z_STEPS_PER_MM 250.0
   #define DEFAULT_X_MAX_RATE 100.0 // mm/min
   #define DEFAULT_Y_MAX_RATE 100.0 // mm/min
@@ -595,11 +603,11 @@
   #define DEFAULT_REPORT_INCHES 0 // false
   #define DEFAULT_INVERT_ST_ENABLE 0 // false
   #define DEFAULT_INVERT_LIMIT_PINS 0 // false
-  #define DEFAULT_SOFT_LIMIT_ENABLE 1 // false
+  #define DEFAULT_SOFT_LIMIT_ENABLE 0 // false
   #define DEFAULT_HARD_LIMIT_ENABLE 0  // false
   #define DEFAULT_INVERT_PROBE_PIN 0 // false
   #define DEFAULT_LASER_MODE 0 // false
-  #define DEFAULT_HOMING_ENABLE 1  // false
+  #define DEFAULT_HOMING_ENABLE 1  // true
   #define DEFAULT_HOMING_DIR_MASK 0 // move positive dir
   #define DEFAULT_HOMING_FEED_RATE 5.0 // mm/min
   #define DEFAULT_HOMING_SEEK_RATE 50.0 // mm/min
