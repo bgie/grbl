@@ -30,7 +30,7 @@ volatile uint8_t sys_probe_state;   // Probing state value.  Used to coordinate 
 volatile uint8_t sys_rt_exec_state;   // Global realtime executor bitflag variable for state management. See EXEC bitmasks.
 volatile uint8_t sys_rt_exec_alarm;   // Global realtime executor bitflag variable for setting various alarms.
 volatile uint8_t sys_rt_exec_motion_override; // Global realtime executor bitflag variable for motion-based overrides.
-volatile uint8_t sys_rt_exec_accessory_override; // Global realtime executor bitflag variable for spindle/coolant overrides.
+volatile uint8_t sys_rt_exec_accessory_override; // Global realtime executor bitflag variable for gripper/coolant overrides.
 #ifdef DEBUG
   volatile uint8_t sys_rt_exec_debug;
 #endif
@@ -76,7 +76,7 @@ int main(void)
     sys.state = prior_state;
     sys.f_override = DEFAULT_FEED_OVERRIDE;  // Set to 100%
     sys.r_override = DEFAULT_RAPID_OVERRIDE; // Set to 100%
-    sys.spindle_speed_ovr = DEFAULT_SPINDLE_SPEED_OVERRIDE; // Set to 100%
+    sys.gripper_speed_ovr = DEFAULT_GRIPPER_SPEED_OVERRIDE; // Set to 100%
 		memset(sys_probe_position,0,sizeof(sys_probe_position)); // Clear probe position.
     sys_probe_state = 0;
     sys_rt_exec_state = 0;
@@ -87,7 +87,7 @@ int main(void)
     // Reset Grbl primary systems.
     serial_reset_read_buffer(); // Clear serial read buffer
     gc_init(); // Set g-code parser to default state
-    spindle_init();
+    gripper_init();
 	  #ifdef PEN_SERVO
 	    servo_init();
 	  #endif

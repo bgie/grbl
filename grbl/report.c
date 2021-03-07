@@ -157,8 +157,8 @@ void report_feedback_message(uint8_t message_code)
       printPgmString(PSTR("Pgm End")); break;
     case MESSAGE_RESTORE_DEFAULTS:
       printPgmString(PSTR("Restoring defaults")); break;
-    case MESSAGE_SPINDLE_RESTORE:
-      printPgmString(PSTR("Restoring spindle")); break;
+    case MESSAGE_GRIPPER_RESTORE:
+      printPgmString(PSTR("Restoring gripper")); break;
     case MESSAGE_SLEEP_MODE:
       printPgmString(PSTR("Sleeping")); break;
   }
@@ -203,7 +203,7 @@ void report_grbl_settings() {
   report_util_float_setting(27,settings.homing_pulloff,N_DECIMAL_SETTINGVALUE);
   report_util_float_setting(30,settings.rpm_max,N_DECIMAL_RPMVALUE);
   report_util_float_setting(31,settings.rpm_min,N_DECIMAL_RPMVALUE);
-  #ifdef VARIABLE_SPINDLE
+  #ifdef VARIABLE_GRIPPER
     report_util_uint8_setting(32,bit_istrue(settings.flags,BITFLAG_LASER_MODE));
   #else
     report_util_uint8_setting(32,0);
@@ -310,10 +310,10 @@ void report_gcode_modes()
   }
 
   report_util_gcode_modes_M();
-  switch (gc_state.modal.spindle) {
-    case SPINDLE_ENABLE_CW : serial_write('3'); break;
-    case SPINDLE_ENABLE_CCW : serial_write('4'); break;
-    case SPINDLE_DISABLE : serial_write('5'); break;
+  switch (gc_state.modal.gripper) {
+    case GRIPPER_ENABLE_CW : serial_write('3'); break;
+    case GRIPPER_ENABLE_CCW : serial_write('4'); break;
+    case GRIPPER_DISABLE : serial_write('5'); break;
   }
 
   #ifdef ENABLE_M7
@@ -340,9 +340,9 @@ void report_gcode_modes()
   printPgmString(PSTR(" F"));
   printFloat_RateValue(gc_state.feed_rate);
 
-  #ifdef VARIABLE_SPINDLE
+  #ifdef VARIABLE_GRIPPER
     printPgmString(PSTR(" S"));
-    printFloat(gc_state.spindle_speed,N_DECIMAL_RPMVALUE);
+    printFloat(gc_state.gripper_speed,N_DECIMAL_RPMVALUE);
   #endif
 
   report_util_feedback_line_feed();
@@ -373,7 +373,7 @@ void report_build_info(char *line)
   printString(line);
   report_util_feedback_line_feed();
   printPgmString(PSTR("[OPT:")); // Generate compile-time build option list
-  #ifdef VARIABLE_SPINDLE
+  #ifdef VARIABLE_GRIPPER
     serial_write('V');
   #endif
   #ifdef USE_LINE_NUMBERS
@@ -403,10 +403,10 @@ void report_build_info(char *line)
   #ifdef ALLOW_FEED_OVERRIDE_DURING_PROBE_CYCLES
     serial_write('A');
   #endif
-  #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
+  #ifdef USE_GRIPPER_DIR_AS_ENABLE_PIN
     serial_write('D');
   #endif
-  #ifdef SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED
+  #ifdef GRIPPER_ENABLE_OFF_WITH_ZERO_SPEED
     serial_write('0');
   #endif
   #ifdef ENABLE_SOFTWARE_DEBOUNCE
@@ -556,11 +556,11 @@ void report_realtime_status()
 
   // Report realtime feed speed
   #ifdef REPORT_FIELD_CURRENT_FEED_SPEED
-    #ifdef VARIABLE_SPINDLE
+    #ifdef VARIABLE_GRIPPER
       printPgmString(PSTR("|FS:"));
       printFloat_RateValue(st_get_realtime_rate());
       serial_write(',');
-      printFloat(sys.spindle_speed,N_DECIMAL_RPMVALUE);
+      printFloat(sys.gripper_speed,N_DECIMAL_RPMVALUE);
     #else
       printPgmString(PSTR("|F:"));
       printFloat_RateValue(st_get_realtime_rate());
@@ -625,22 +625,22 @@ void report_realtime_status()
       serial_write(',');
       print_uint8_base10(sys.r_override);
       serial_write(',');
-      print_uint8_base10(sys.spindle_speed_ovr);
+      print_uint8_base10(sys.gripper_speed_ovr);
 
-      uint8_t sp_state = spindle_get_state();
+      uint8_t sp_state = gripper_get_state();
       uint8_t cl_state = coolant_get_state();
       if (sp_state || cl_state) {
         printPgmString(PSTR("|A:"));
-        if (sp_state) { // != SPINDLE_STATE_DISABLE
-          #ifdef VARIABLE_SPINDLE 
-            #ifdef USE_SPINDLE_DIR_AS_ENABLE_PIN
+        if (sp_state) { // != GRIPPER_STATE_DISABLE
+          #ifdef VARIABLE_GRIPPER 
+            #ifdef USE_GRIPPER_DIR_AS_ENABLE_PIN
               serial_write('S'); // CW
             #else
-              if (sp_state == SPINDLE_STATE_CW) { serial_write('S'); } // CW
+              if (sp_state == GRIPPER_STATE_CW) { serial_write('S'); } // CW
               else { serial_write('C'); } // CCW
             #endif
           #else
-            if (sp_state & SPINDLE_STATE_CW) { serial_write('S'); } // CW
+            if (sp_state & GRIPPER_STATE_CW) { serial_write('S'); } // CW
             else { serial_write('C'); } // CCW
           #endif
         }

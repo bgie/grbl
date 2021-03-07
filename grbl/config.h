@@ -46,8 +46,8 @@
 #define PEN_SERVO
 
 /*
-For the pen we want to use the variable spindle PWM to control a servo.
-The spindle output is using a PWM, but we need to adjust that 
+For the pen we want to use the variable gripper PWM to control a servo.
+The gripper output is using a PWM, but we need to adjust that 
 Use 1024 prescaler to get 16,000,000 Mhz  / 1024 = 15625 Hz
 It is an 8 bit timer so 15625 / 256 = 61 Hz. This is pretty close the the 50Hz recommended for servos
 Each tick = 0.000064sec 
@@ -57,8 +57,8 @@ The other end is 0.002 sec (0.002 / 0.000064 = 31 ticks)
 These are full travel values. If you want to move less than full travel adjust these values
 If your servo is going the wrong way, swap them.
 */
-#define PEN_SERVO_DOWN     31
-#define PEN_SERVO_UP       16 
+#define PEN_SERVO_DOWN     38
+#define PEN_SERVO_UP       5
 
 /*
 The Z-values corresponding to the pen up and pen down position. Z values in between will be interpolated.
@@ -104,12 +104,12 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 #define CMD_RAPID_OVR_MEDIUM 0x96
 #define CMD_RAPID_OVR_LOW 0x97
 // #define CMD_RAPID_OVR_EXTRA_LOW 0x98 // *NOT SUPPORTED*
-#define CMD_SPINDLE_OVR_RESET 0x99      // Restores spindle override value to 100%.
-#define CMD_SPINDLE_OVR_COARSE_PLUS 0x9A
-#define CMD_SPINDLE_OVR_COARSE_MINUS 0x9B
-#define CMD_SPINDLE_OVR_FINE_PLUS 0x9C
-#define CMD_SPINDLE_OVR_FINE_MINUS 0x9D
-#define CMD_SPINDLE_OVR_STOP 0x9E
+#define CMD_GRIPPER_OVR_RESET 0x99      // Restores gripper override value to 100%.
+#define CMD_GRIPPER_OVR_COARSE_PLUS 0x9A
+#define CMD_GRIPPER_OVR_COARSE_MINUS 0x9B
+#define CMD_GRIPPER_OVR_FINE_PLUS 0x9C
+#define CMD_GRIPPER_OVR_FINE_MINUS 0x9D
+#define CMD_GRIPPER_OVR_STOP 0x9E
 #define CMD_COOLANT_FLOOD_OVR_TOGGLE 0xA0
 #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA1
 
@@ -206,8 +206,8 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 // #define ENABLE_SAFETY_DOOR_INPUT_PIN // Default disabled. Uncomment to enable.
 
 // After the safety door switch has been toggled and restored, this setting sets the power-up delay
-// between restoring the spindle and coolant and resuming the cycle.
-#define SAFETY_DOOR_SPINDLE_DELAY 4.0 // Float (seconds)
+// between restoring the gripper and coolant and resuming the cycle.
+#define SAFETY_DOOR_GRIPPER_DELAY 4.0 // Float (seconds)
 #define SAFETY_DOOR_COOLANT_DELAY 1.0 // Float (seconds)
 
 // Enable CoreXY kinematics. Use ONLY with CoreXY machines.
@@ -234,12 +234,12 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 // NOTE: PLEASE DO NOT USE THIS, unless you have a situation that needs it.
 // #define INVERT_LIMIT_PIN_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)) // Default disabled. Uncomment to enable.
 
-// Inverts the spindle enable pin from low-disabled/high-enabled to low-enabled/high-disabled. Useful
+// Inverts the gripper enable pin from low-disabled/high-enabled to low-enabled/high-disabled. Useful
 // for some pre-built electronic boards.
-// NOTE: If VARIABLE_SPINDLE is enabled(default), this option has no effect as the PWM output and
-// spindle enable are combined to one pin. If you need both this option and spindle speed PWM,
-// uncomment the config option USE_SPINDLE_DIR_AS_ENABLE_PIN below.
-// #define INVERT_SPINDLE_ENABLE_PIN // Default disabled. Uncomment to enable.
+// NOTE: If VARIABLE_GRIPPER is enabled(default), this option has no effect as the PWM output and
+// gripper enable are combined to one pin. If you need both this option and gripper speed PWM,
+// uncomment the config option USE_GRIPPER_DIR_AS_ENABLE_PIN below.
+// #define INVERT_GRIPPER_ENABLE_PIN // Default disabled. Uncomment to enable.
 
 // Inverts the selected coolant pin from low-disabled/high-enabled to low-enabled/high-disabled. Useful
 // for some pre-built electronic boards.
@@ -266,7 +266,7 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 // Enables code for debugging purposes. Not for general use and always in constant flux.
 // #define DEBUG // Uncomment to enable. Default disabled.
 
-// Configure rapid, feed, and spindle override settings. These values define the max and min
+// Configure rapid, feed, and gripper override settings. These values define the max and min
 // allowable override values and the coarse and fine increments per command received. Please
 // note the allowable values in the descriptions following each define.
 #define DEFAULT_FEED_OVERRIDE           100 // 100%. Don't change this value.
@@ -280,14 +280,14 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 #define RAPID_OVERRIDE_LOW       25 // Percent of rapid (1-99). Usually 25%.
 // #define RAPID_OVERRIDE_EXTRA_LOW 5 // *NOT SUPPORTED* Percent of rapid (1-99). Usually 5%.
 
-#define DEFAULT_SPINDLE_SPEED_OVERRIDE    100 // 100%. Don't change this value.
-#define MAX_SPINDLE_SPEED_OVERRIDE        200 // Percent of programmed spindle speed (100-255). Usually 200%.
-#define MIN_SPINDLE_SPEED_OVERRIDE         10 // Percent of programmed spindle speed (1-100). Usually 10%.
-#define SPINDLE_OVERRIDE_COARSE_INCREMENT  10 // (1-99). Usually 10%.
-#define SPINDLE_OVERRIDE_FINE_INCREMENT     1 // (1-99). Usually 1%.
+#define DEFAULT_GRIPPER_SPEED_OVERRIDE    100 // 100%. Don't change this value.
+#define MAX_GRIPPER_SPEED_OVERRIDE        200 // Percent of programmed gripper speed (100-255). Usually 200%.
+#define MIN_GRIPPER_SPEED_OVERRIDE         10 // Percent of programmed gripper speed (1-100). Usually 10%.
+#define GRIPPER_OVERRIDE_COARSE_INCREMENT  10 // (1-99). Usually 10%.
+#define GRIPPER_OVERRIDE_FINE_INCREMENT     1 // (1-99). Usually 1%.
 
 // When a M2 or M30 program end command is executed, most g-code states are restored to their defaults.
-// This compile-time option includes the restoring of the feed, rapid, and spindle speed override values
+// This compile-time option includes the restoring of the feed, rapid, and gripper speed override values
 // to their default values at program end.
 #define RESTORE_OVERRIDES_AFTER_PROGRAM_END // Default enabled. Comment to disable.
 
@@ -358,45 +358,45 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 //#define DISABLE_PROBE_PIN_PULL_UP
 //#define DISABLE_CONTROL_PIN_PULL_UP
 
-// Sets which axis the tool length offset is applied. Assumes the spindle is always parallel with
+// Sets which axis the tool length offset is applied. Assumes the gripper is always parallel with
 // the selected axis with the tool oriented toward the negative direction. In other words, a positive
 // tool length offset value is subtracted from the current location.
 #define TOOL_LENGTH_OFFSET_AXIS Z_AXIS // Default z-axis. Valid values are X_AXIS, Y_AXIS, or Z_AXIS.
 
-// Enables variable spindle output voltage for different RPM values. On the Arduino Uno, the spindle
+// Enables variable gripper output voltage for different RPM values. On the Arduino Uno, the gripper
 // enable pin will output 5V for maximum RPM with 256 intermediate levels and 0V when disabled.
-// NOTE: IMPORTANT for Arduino Unos! When enabled, the Z-limit pin D11 and spindle enable pin D12 switch!
-// The hardware PWM output on pin D11 is required for variable spindle output voltages.
-// #define VARIABLE_SPINDLE // Default enabled. Comment to disable.
+// NOTE: IMPORTANT for Arduino Unos! When enabled, the Z-limit pin D11 and gripper enable pin D12 switch!
+// The hardware PWM output on pin D11 is required for variable gripper output voltages.
+// #define VARIABLE_GRIPPER // Default enabled. Comment to disable.
 
-// Used by variable spindle output only. This forces the PWM output to a minimum duty cycle when enabled.
-// The PWM pin will still read 0V when the spindle is disabled. Most users will not need this option, but
-// it may be useful in certain scenarios. This minimum PWM settings coincides with the spindle rpm minimum
+// Used by variable gripper output only. This forces the PWM output to a minimum duty cycle when enabled.
+// The PWM pin will still read 0V when the gripper is disabled. Most users will not need this option, but
+// it may be useful in certain scenarios. This minimum PWM settings coincides with the gripper rpm minimum
 // setting, like rpm max to max PWM. This is handy if you need a larger voltage difference between 0V disabled
 // and the voltage set by the minimum PWM for minimum rpm. This difference is 0.02V per PWM value. So, when
 // minimum PWM is at 1, only 0.02 volts separate enabled and disabled. At PWM 5, this would be 0.1V. Keep
 // in mind that you will begin to lose PWM resolution with increased minimum PWM values, since you have less
-// and less range over the total 255 PWM levels to signal different spindle speeds.
-// NOTE: Compute duty cycle at the minimum PWM by this equation: (% duty cycle)=(SPINDLE_PWM_MIN_VALUE/255)*100
-// #define SPINDLE_PWM_MIN_VALUE 5 // Default disabled. Uncomment to enable. Must be greater than zero. Integer (1-255).
+// and less range over the total 255 PWM levels to signal different gripper speeds.
+// NOTE: Compute duty cycle at the minimum PWM by this equation: (% duty cycle)=(GRIPPER_PWM_MIN_VALUE/255)*100
+// #define GRIPPER_PWM_MIN_VALUE 5 // Default disabled. Uncomment to enable. Must be greater than zero. Integer (1-255).
 
-// By default on a 328p(Uno), Grbl combines the variable spindle PWM and the enable into one pin to help
+// By default on a 328p(Uno), Grbl combines the variable gripper PWM and the enable into one pin to help
 // preserve I/O pins. For certain setups, these may need to be separate pins. This configure option uses
-// the spindle direction pin(D13) as a separate spindle enable pin along with spindle speed PWM on pin D11.
-// NOTE: This configure option only works with VARIABLE_SPINDLE enabled and a 328p processor (Uno).
+// the gripper direction pin(D13) as a separate gripper enable pin along with gripper speed PWM on pin D11.
+// NOTE: This configure option only works with VARIABLE_GRIPPER enabled and a 328p processor (Uno).
 // NOTE: Without a direction pin, M4 will not have a pin output to indicate a difference with M3. 
 // NOTE: BEWARE! The Arduino bootloader toggles the D13 pin when it powers up. If you flash Grbl with
 // a programmer (you can use a spare Arduino as "Arduino as ISP". Search the web on how to wire this.),
 // this D13 LED toggling should go away. We haven't tested this though. Please report how it goes!
-// #define USE_SPINDLE_DIR_AS_ENABLE_PIN // Default disabled. Uncomment to enable.
+// #define USE_GRIPPER_DIR_AS_ENABLE_PIN // Default disabled. Uncomment to enable.
 
-// Alters the behavior of the spindle enable pin with the USE_SPINDLE_DIR_AS_ENABLE_PIN option . By default,
-// Grbl will not disable the enable pin if spindle speed is zero and M3/4 is active, but still sets the PWM 
-// output to zero. This allows the users to know if the spindle is active and use it as an additional control
-// input. However, in some use cases, user may want the enable pin to disable with a zero spindle speed and 
-// re-enable when spindle speed is greater than zero. This option does that.
-// NOTE: Requires USE_SPINDLE_DIR_AS_ENABLE_PIN to be enabled.
-// #define SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED // Default disabled. Uncomment to enable.
+// Alters the behavior of the gripper enable pin with the USE_GRIPPER_DIR_AS_ENABLE_PIN option . By default,
+// Grbl will not disable the enable pin if gripper speed is zero and M3/4 is active, but still sets the PWM 
+// output to zero. This allows the users to know if the gripper is active and use it as an additional control
+// input. However, in some use cases, user may want the enable pin to disable with a zero gripper speed and 
+// re-enable when gripper speed is greater than zero. This option does that.
+// NOTE: Requires USE_GRIPPER_DIR_AS_ENABLE_PIN to be enabled.
+// #define GRIPPER_ENABLE_OFF_WITH_ZERO_SPEED // Default disabled. Uncomment to enable.
 
 // With this enabled, Grbl sends back an echo of the line it has received, which has been pre-parsed (spaces
 // removed, capitalized letters, no comments) and is to be immediately executed by Grbl. Echoes will not be
@@ -599,7 +599,7 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 #define PARKING_TARGET -5.0 // Parking axis target. In mm, as machine coordinate [-max_travel,0].
 #define PARKING_RATE 500.0 // Parking fast rate after pull-out in mm/min.
 #define PARKING_PULLOUT_RATE 100.0 // Pull-out/plunge slow feed rate in mm/min.
-#define PARKING_PULLOUT_INCREMENT 5.0 // Spindle pull-out and plunge distance in mm. Incremental distance.
+#define PARKING_PULLOUT_INCREMENT 5.0 // Gripper pull-out and plunge distance in mm. Incremental distance.
                                       // Must be positive value or equal to zero.
 
 // Enables a special set of M-code commands that enables and disables the parking motion. 
@@ -611,21 +611,21 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 // #define ENABLE_PARKING_OVERRIDE_CONTROL   // Default disabled. Uncomment to enable
 // #define DEACTIVATE_PARKING_UPON_INIT // Default disabled. Uncomment to enable.
 
-// This option will automatically disable the laser during a feed hold by invoking a spindle stop
+// This option will automatically disable the laser during a feed hold by invoking a gripper stop
 // override immediately after coming to a stop. However, this also means that the laser still may
-// be reenabled by disabling the spindle stop override, if needed. This is purely a safety feature
+// be reenabled by disabling the gripper stop override, if needed. This is purely a safety feature
 // to ensure the laser doesn't inadvertently remain powered while at a stop and cause a fire.
 #define DISABLE_LASER_DURING_HOLD // Default enabled. Comment to disable.
 
-// This feature alters the spindle PWM/speed to a nonlinear output with a simple piecewise linear
-// curve. Useful for spindles that don't produce the right RPM from Grbl's standard spindle PWM 
-// linear model. Requires a solution by the 'fit_nonlinear_spindle.py' script in the /doc/script
-// folder of the repo. See file comments on how to gather spindle data and run the script to
+// This feature alters the gripper PWM/speed to a nonlinear output with a simple piecewise linear
+// curve. Useful for grippers that don't produce the right RPM from Grbl's standard gripper PWM 
+// linear model. Requires a solution by the 'fit_nonlinear_gripper.py' script in the /doc/script
+// folder of the repo. See file comments on how to gather gripper data and run the script to
 // generate a solution.
-// #define ENABLE_PIECEWISE_LINEAR_SPINDLE  // Default disabled. Uncomment to enable.
+// #define ENABLE_PIECEWISE_LINEAR_GRIPPER  // Default disabled. Uncomment to enable.
 
 // N_PIECES, RPM_MAX, RPM_MIN, RPM_POINTxx, and RPM_LINE_XX constants are all set and given by
-// the 'fit_nonlinear_spindle.py' script solution. Used only when ENABLE_PIECEWISE_LINEAR_SPINDLE
+// the 'fit_nonlinear_gripper.py' script solution. Used only when ENABLE_PIECEWISE_LINEAR_GRIPPER
 // is enabled. Make sure the constant values are exactly the same as the script solution.
 // NOTE: When N_PIECES < 4, unused RPM_LINE and RPM_POINT defines are not required and omitted.
 #define N_PIECES 4  // Integer (1-4). Number of piecewise lines used in script solution.
@@ -667,7 +667,7 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 */
 // NOTE: This feature requires approximately 400 bytes of flash. Certain configurations can
 // run out of flash to fit on an Arduino 328p/Uno. Only X and Y axes are supported. Variable
-// spindle/laser mode IS supported, but only for one config option. Core XY, spindle direction
+// gripper/laser mode IS supported, but only for one config option. Core XY, gripper direction
 // pin, and M7 mist coolant are disabled/not supported.
 // #define ENABLE_DUAL_AXIS	// Default disabled. Uncomment to enable.
 
@@ -688,18 +688,18 @@ But interpolation only has 15 ticks on the full range, so servo movement will be
 // Dual axis pin configuration currently supports two shields. Uncomment the shield you want,
 // and comment out the other one(s).
 // NOTE: Protoneer CNC Shield v3.51 has A.STP and A.DIR wired to pins A4 and A3 respectively.
-// The variable spindle (i.e. laser mode) build option works and may be enabled or disabled.
-// Coolant pin A3 is moved to D13, replacing spindle direction.
+// The variable gripper (i.e. laser mode) build option works and may be enabled or disabled.
+// Coolant pin A3 is moved to D13, replacing gripper direction.
 #define DUAL_AXIS_CONFIG_PROTONEER_V3_51    // Uncomment to select. Comment other configs.
 
 // NOTE: Arduino CNC Shield Clone (Originally Protoneer v3.0) has A.STP and A.DIR wired to 
 // D12 and D13, respectively. With the limit pins and stepper enable pin on this same port,
-// the spindle enable pin had to be moved and spindle direction pin deleted. The spindle
+// the gripper enable pin had to be moved and gripper direction pin deleted. The gripper
 // enable pin now resides on A3, replacing coolant enable. Coolant enable is bumped over to
-// pin A4. Spindle enable is used far more and this pin setup helps facilitate users to 
+// pin A4. Gripper enable is used far more and this pin setup helps facilitate users to 
 // integrate this feature without arguably too much work. 
-// Variable spindle (i.e. laser mode) does NOT work with this shield as configured. While
-// variable spindle technically can work with this shield, it requires too many changes for
+// Variable gripper (i.e. laser mode) does NOT work with this shield as configured. While
+// variable gripper technically can work with this shield, it requires too many changes for
 // most user setups to accomodate. It would best be implemented by sharing all limit switches
 // on pins D9/D10 (as [X1,Z]/[X2,Y] or [X,Y2]/[Y1,Z]), home each axis independently, and 
 // updating lots of code to ensure everything is running correctly.

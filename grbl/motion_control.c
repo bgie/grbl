@@ -64,54 +64,16 @@ void mc_line(float *target, plan_line_data_t *pl_data)
     else { break; }
   } while (1);
 
-  #ifdef SCARA
-    //Change from cartessian to polar coordinates
-    float target_polar[N_AXIS];
-    uint8_t idx;
-    for (idx=Z_AXIS; idx<N_AXIS; idx++) {
-      target_polar[idx]=target[idx];
-    }
-    
-    float x = target[X_AXIS];
-    float y = target[Y_AXIS];
-    
-    float angle2_home_offset = acos( (HOME_CARTHESIAN_X*HOME_CARTHESIAN_X + HOME_CARTHESIAN_Y*HOME_CARTHESIAN_Y - ARM1_LENGTH*ARM1_LENGTH - ARM2_LENGTH*ARM2_LENGTH) / (2*ARM1_LENGTH*ARM2_LENGTH) );
-    float angle1_home_offset = atan2(HOME_CARTHESIAN_Y,HOME_CARTHESIAN_X) - atan2(ARM2_LENGTH * sin(angle2_home_offset), ARM1_LENGTH + (ARM2_LENGTH * cos(angle2_home_offset)));
-    
-    float angle2 = acos( (x*x + y*y - ARM1_LENGTH*ARM1_LENGTH - ARM2_LENGTH*ARM2_LENGTH) / (2*ARM1_LENGTH*ARM2_LENGTH) );
-    float angle1 = atan2(y,x) - atan2(ARM2_LENGTH * sin(angle2), ARM1_LENGTH + (ARM2_LENGTH * cos(angle2)));
-    target_polar[X_AXIS]=angle1 - angle1_home_offset;
-    target_polar[Y_AXIS]=angle2 - angle2_home_offset;
-    
-    printFloat(x,3);
-    printString(" ");
-    printFloat(y,3);
-    printString(" ");
-    printFloat(angle1_home_offset,3);
-    printString(" ");
-    printFloat(angle2_home_offset,3);
-    printString(" ");
-    printFloat(angle1,3);
-    printString(" ");
-    printFloat(angle2,3);
-    printString("\r\n");
-    
-    plan_buffer_line(target_polar, pl_data);
-    gc_state.position[X_AXIS]=target[X_AXIS];
-    gc_state.position[Y_AXIS]=target[Y_AXIS];
-
-  #else
-    // Plan and queue motion into planner buffer
-    if (plan_buffer_line(target, pl_data) == PLAN_EMPTY_BLOCK) {
-      if (bit_istrue(settings.flags,BITFLAG_LASER_MODE)) {
-        // Correctly set spindle state, if there is a coincident position passed. Forces a buffer
-        // sync while in M3 laser mode only.
-        if (pl_data->condition & PL_COND_FLAG_SPINDLE_CW) {
-          spindle_sync(PL_COND_FLAG_SPINDLE_CW, pl_data->spindle_speed);
-        }
+  // Plan and queue motion into planner buffer
+  if (plan_buffer_line(target, pl_data) == PLAN_EMPTY_BLOCK) {
+    if (bit_istrue(settings.flags,BITFLAG_LASER_MODE)) {
+      // Correctly set gripper state, if there is a coincident position passed. Forces a buffer
+      // sync while in M3 laser mode only.
+      if (pl_data->condition & PL_COND_FLAG_GRIPPER_CW) {
+        gripper_sync(PL_COND_FLAG_GRIPPER_CW, pl_data->gripper_speed);
       }
     }
-  #endif
+  }
 }
 
 
@@ -248,7 +210,7 @@ void mc_homing_cycle(uint8_t cycle_mask)
   // TODO: Move the pin-specific LIMIT_PIN call to limits.c as a function.
   #ifdef LIMITS_TWO_SWITCHES_ON_AXES
     if (limits_get_state()) {
-      mc_reset(); // Issue system reset and ensure spindle and coolant are shutdown.
+      mc_reset(); // Issue system reset and ensure gripper and coolant are shutdown.
       system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT);
       return;
     }
@@ -281,14 +243,8 @@ void mc_homing_cycle(uint8_t cycle_mask)
   // -------------------------------------------------------------------------------------
 
   // Sync gcode parser and planner positions to homed position.
-  #ifndef SCARA
-    gc_sync_position();
-    plan_sync_position();
-  #else
-    gc_sync_position();
-    gc_state.position[X_AXIS]=HOME_CARTHESIAN_X;
-    gc_state.position[Y_AXIS]=HOME_CARTHESIAN_Y;
-  #endif
+  gc_sync_position();
+  plan_sync_position();
 
   // If hard limits feature enabled, re-enable hard limits pin change register after homing cycle.
   limits_init();
@@ -413,8 +369,8 @@ void mc_reset()
   if (bit_isfalse(sys_rt_exec_state, EXEC_RESET)) {
     system_set_exec_state_flag(EXEC_RESET);
 
-    // Kill spindle and coolant.
-    spindle_stop();
+    // Kill gripper and coolant.
+    gripper_stop();
     coolant_stop();
 
     // Kill steppers only if in any motion state, i.e. cycle, actively holding, or homing.

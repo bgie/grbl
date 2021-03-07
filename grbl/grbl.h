@@ -57,7 +57,7 @@
 #include "protocol.h"
 #include "report.h"
 #include "serial.h"
-#include "spindle_control.h"
+#include "gripper_control.h"
 #include "servo_control.h"
 #include "stepper.h"
 #include "jog.h"
@@ -69,16 +69,16 @@
   #error "Required HOMING_CYCLE_0 not defined."
 #endif
 
-#if defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) && !defined(VARIABLE_SPINDLE)
-  #error "USE_SPINDLE_DIR_AS_ENABLE_PIN may only be used with VARIABLE_SPINDLE enabled"
+#if defined(USE_GRIPPER_DIR_AS_ENABLE_PIN) && !defined(VARIABLE_GRIPPER)
+  #error "USE_GRIPPER_DIR_AS_ENABLE_PIN may only be used with VARIABLE_GRIPPER enabled"
 #endif
 
-#if defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) && !defined(CPU_MAP_ATMEGA328P)
-  #error "USE_SPINDLE_DIR_AS_ENABLE_PIN may only be used with a 328p processor"
+#if defined(USE_GRIPPER_DIR_AS_ENABLE_PIN) && !defined(CPU_MAP_ATMEGA328P)
+  #error "USE_GRIPPER_DIR_AS_ENABLE_PIN may only be used with a 328p processor"
 #endif
 
-#if !defined(USE_SPINDLE_DIR_AS_ENABLE_PIN) && defined(SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED)
-  #error "SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED may only be used with USE_SPINDLE_DIR_AS_ENABLE_PIN enabled"
+#if !defined(USE_GRIPPER_DIR_AS_ENABLE_PIN) && defined(GRIPPER_ENABLE_OFF_WITH_ZERO_SPEED)
+  #error "GRIPPER_ENABLE_OFF_WITH_ZERO_SPEED may only be used with USE_GRIPPER_DIR_AS_ENABLE_PIN enabled"
 #endif
 
 #if defined(PARKING_ENABLE)
@@ -93,9 +93,9 @@
   #endif
 #endif
 
-#if defined(SPINDLE_PWM_MIN_VALUE)
-  #if !(SPINDLE_PWM_MIN_VALUE > 0)
-    #error "SPINDLE_PWM_MIN_VALUE must be greater than zero."
+#if defined(GRIPPER_PWM_MIN_VALUE)
+  #if !(GRIPPER_PWM_MIN_VALUE > 0)
+    #error "GRIPPER_PWM_MIN_VALUE must be greater than zero."
   #endif
 #endif
 
@@ -116,8 +116,8 @@
   #if !((DUAL_AXIS_SELECT == X_AXIS) || (DUAL_AXIS_SELECT == Y_AXIS))
     #error "Dual axis currently supports X or Y axes only."
   #endif
-  #if defined(DUAL_AXIS_CONFIG_CNC_SHIELD_CLONE) && defined(VARIABLE_SPINDLE)
-    #error "VARIABLE_SPINDLE not supported with DUAL_AXIS_CNC_SHIELD_CLONE."
+  #if defined(DUAL_AXIS_CONFIG_CNC_SHIELD_CLONE) && defined(VARIABLE_GRIPPER)
+    #error "VARIABLE_GRIPPER not supported with DUAL_AXIS_CNC_SHIELD_CLONE."
   #endif
   #if defined(DUAL_AXIS_CONFIG_CNC_SHIELD_CLONE) && defined(DUAL_AXIS_CONFIG_PROTONEER_V3_51)
     #error "More than one dual axis configuration found. Select one."
@@ -131,16 +131,16 @@
   #if defined(SCARA)
     #error "SCARA not supported with dual axis feature."
   #endif
-  #if defined(USE_SPINDLE_DIR_AS_ENABLE_PIN)
-    #error "USE_SPINDLE_DIR_AS_ENABLE_PIN not supported with dual axis feature."
+  #if defined(USE_GRIPPER_DIR_AS_ENABLE_PIN)
+    #error "USE_GRIPPER_DIR_AS_ENABLE_PIN not supported with dual axis feature."
   #endif
   #if defined(ENABLE_M7)
     #error "ENABLE_M7 not supported with dual axis feature."
   #endif
 #endif
 
-#if defined(VARIABLE_SPINDLE) && defined(PEN_SERVO)
-  #error PEN_SERVO and VARIABLE_SPINDLE can not be combined, both use the same PWM pin
+#if defined(VARIABLE_GRIPPER) && defined(PEN_SERVO)
+  #error PEN_SERVO and VARIABLE_GRIPPER can not be combined, both use the same PWM pin
 #endif
 
 // ---------------------------------------------------------------------------------------
