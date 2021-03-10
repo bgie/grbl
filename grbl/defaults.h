@@ -570,13 +570,15 @@
 
 
 #ifdef DEFAULTS_SCARA
-  // settings for SCARA robot arm
-  #define DEFAULT_X_STEPS_PER_MM 2000.0
-  #define DEFAULT_Y_STEPS_PER_MM 2000.0
-  #define DEFAULT_Z_STEPS_PER_MM 250.0
-  #define DEFAULT_X_MAX_RATE 500.0 // mm/min
-  #define DEFAULT_Y_MAX_RATE 500.0 // mm/min
-  #define DEFAULT_Z_MAX_RATE 500.0 // mm/min
+  // settings for SCARA robot arm  
+  // 200 steps per rotation, 16 microsteps per step, 20 teeth on motor, 80 teeth on arm = 12800 microsteps for a full arm rotation
+  // Rotation = 2*PI radians -> 2037.1832715762602978417121711682 steps per radian
+  #define DEFAULT_X_STEPS_PER_MM 2037.1832715762602978417121711682
+  #define DEFAULT_Y_STEPS_PER_MM 2037.1832715762602978417121711682
+  #define DEFAULT_Z_STEPS_PER_MM 2037.1832715762602978417121711682
+  #define DEFAULT_X_MAX_RATE 500.0 // radians/min
+  #define DEFAULT_Y_MAX_RATE 500.0 // radians/min
+  #define DEFAULT_Z_MAX_RATE 500.0 // radians/min
   #define DEFAULT_X_ACCELERATION (10.0*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2
   #define DEFAULT_Y_ACCELERATION (10.0*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2
   #define DEFAULT_Z_ACCELERATION (10.0*60*60) // 10*60*60 mm/min^2 = 10 mm/sec^2
@@ -595,11 +597,11 @@
   #define DEFAULT_REPORT_INCHES 0 // false
   #define DEFAULT_INVERT_ST_ENABLE 0 // false
   #define DEFAULT_INVERT_LIMIT_PINS 0 // false
-  #define DEFAULT_SOFT_LIMIT_ENABLE 1 // false
+  #define DEFAULT_SOFT_LIMIT_ENABLE 0 // false
   #define DEFAULT_HARD_LIMIT_ENABLE 0  // false
   #define DEFAULT_INVERT_PROBE_PIN 0 // false
   #define DEFAULT_LASER_MODE 0 // false
-  #define DEFAULT_HOMING_ENABLE 1  // false
+  #define DEFAULT_HOMING_ENABLE 1  // true
   #define DEFAULT_HOMING_DIR_MASK 0 // move positive dir
   #define DEFAULT_HOMING_FEED_RATE 5.0 // mm/min
   #define DEFAULT_HOMING_SEEK_RATE 50.0 // mm/min

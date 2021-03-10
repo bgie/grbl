@@ -1,3 +1,10 @@
+Modified version of grbl for 3d printed SCARA robot arm.
+
+Changes:
+- modified configuration to match SCARA robot arm.
+- stepper motor calculation adapted to match pulley system of 2nd robot axis.
+
+
 ![GitHub Logo](https://github.com/gnea/gnea-Media/blob/master/Grbl%20Logo/Grbl%20Logo%20250px.png?raw=true)
 
 ***
